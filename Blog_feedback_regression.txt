@@ -1,0 +1,47 @@
+import requests, zipfile, io
+r = requests.get('https://github.com/Akshaya0909/enigma/blob/master/BlogFeedback.zip?raw=true')
+z = zipfile.ZipFile(io.BytesIO(r.content))
+z.extractall()
+
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+df = pd.read_csv('blogData_train.csv',header=None,names=list(range(1,282)))
+df = (df - df.mean())/df.std() # Normalizing the data or data whitening 
+#df.head()
+X = df.iloc[:,51:56]
+ones = np.ones([X.shape[0],1])
+X = np.concatenate((ones,X),axis=1)
+y = df.iloc[:,280:281].values
+theta = np.zeros([1,6])
+alpha = 0.1
+iters = 100
+
+def computeCost(X,y,theta):
+  summed = (np.matmul(X,theta.T)-y)
+  return np.sum(summed)/(2*len(X))
+
+def gradientDescent(X,y,theta,iters,alpha):
+  cost = np.zeros(iters)
+  for i in range(iters):
+    theta = theta - (alpha/len(X))*np.sum(X*(np.matmul(X,theta.T) - y),axis=0)
+    cost[i]=computeCost(X,y,theta)
+    return theta,cost
+
+g,cost = gradientDescent(X,y,theta,iters,alpha)
+print("The weights are",g)
+final_cost = computeCost(X,y,g)
+print("Final cost : ",final_cost)
+
+df_test = pd.read_csv('blogData_test-2012.03.05.00_00.csv',header=None,names=list(range(1,282)))
+df_test = (df_test - df_test.mean())/df_test.std()
+X_test = df_test.iloc[:,51:56]
+ones_test = np.ones([X_test.shape[0],1])
+X_test = np.concatenate((ones_test,X_test),axis=1)
+y_test = df_test.iloc[:,280:281].values
+y_pred = np.matmul(X_test,g.T)
+pred_cost = computeCost(X_test,y_test,g)
+print("Prediction cost : ",pred_cost)
+
+
+
