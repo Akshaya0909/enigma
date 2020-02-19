@@ -1,0 +1,51 @@
+import requests, zipfile, io
+r = requests.get('https://github.com/Akshaya0909/enigma/blob/master/breast-cancer-wisconsin-data.zip?raw=true')
+z = zipfile.ZipFile(io.BytesIO(r.content))
+z.extractall()
+
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+df = pd.read_csv('data.csv')
+df['split'] = np.random.randn(df.shape[0],1)
+msk = np.random.rand(len(df)) <=0.7
+df_train = df[msk]
+df_test = df[~msk]
+X = df_train.iloc[:,3:32]
+X = (X-X.mean())/X.std()
+ones = np.ones([X.shape[0],1])
+X = np.concatenate((ones,X),axis=1)
+#print(X.shape)
+y = df_train.iloc[:,2:3].values
+y = (y-y.mean())/y.std()
+theta = np.zeros([1,30])
+alpha = 0.1
+iters = 100
+
+def computeCost(X,y,theta):
+  summed = (np.matmul(X,theta.T)-y)
+  return np.sum(summed)/(2*len(X))
+
+def gradientDescent(X,y,theta,iters,alpha):
+  cost = np.zeros(iters)
+  for i in range(iters):
+    theta = theta - (alpha/len(X))*np.sum(X*(np.matmul(X,theta.T) - y),axis=0)
+    cost[i]=computeCost(X,y,theta)
+    return theta,cost
+
+g,cost = gradientDescent(X,y,theta,iters,alpha)
+print("The weights are",g)
+final_cost = computeCost(X,y,g)
+print("Final cost : ",final_cost)
+
+X_test = df_test.iloc[:,3:32]
+X_test = (X_test-X_test.mean())/X_test.std()
+ones = np.ones([X_test.shape[0],1])
+X_test = np.concatenate((ones,X_test),axis=1)
+#print(X.shape)
+y_test = df_test.iloc[:,2:3].values
+y_test = (y_test-y_test.mean())/y_test.std()
+
+y_pred = np.matmul(X_test,g.T)
+pred_cost = computeCost(X_test,y_test,g)
+print("Prediction cost : ",pred_cost)
