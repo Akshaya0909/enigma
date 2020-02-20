@@ -1,0 +1,4 @@
+id,sepallength,sepalwidth,petallength,petalwidth,class,predictedclass,entropy,pro_dis: Iris-setosa,pro_dis: Iris-versicolor,pro_dis: Iris-virginica
+1,5,3.6,1.4,0.2,?,Iris-setosa,0.6108643020548935,0.7,0.3,0
+2,5.7,2.8,4.5,1.3,?,Iris-versicolor,0,0,1,0
+3,7.6,3,6.6,2.1,?,Iris-virginica,1.0985131762126916,0.333,0.333,0.333
