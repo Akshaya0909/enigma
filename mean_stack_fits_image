@@ -1,0 +1,38 @@
+from astropy.io import fits
+import numpy as np
+def mean_fits(filenames):
+  n = len(filenames)
+  if n>0:
+    hdu_list = fits.open(filenames[0])
+    data = hdu_list[0].data
+    hdu_list.close()
+    for i in range(1,n):
+      hdu_list = fits.open(filenames[i])
+      data+= hdu_list[0].data
+      hdu_list.close()
+    mean = data/n
+    return mean     # The mean stack
+  
+  # Test your function with examples from the question
+  data  = mean_fits(['image0.fits', 'image1.fits', 'image2.fits'])
+  print(data[100, 100])
+
+  # You can also plot the result:
+  import matplotlib.pyplot as plt
+  plt.imshow(data.T, cmap=plt.cm.viridis)
+  plt.colorbar()
+  plt.show()
+  
+  # To find index of brightest point in an image
+  
+  from astropy.io import fits
+  import numpy as np
+  def load_fits(name):
+  hdu_list = fits.open(name)
+  data = hdu_list[0].data
+  brightest = np.argmax(data)
+  pos = np.unravel_index(brightest,data.shape)
+  return pos
+
+  
+  
